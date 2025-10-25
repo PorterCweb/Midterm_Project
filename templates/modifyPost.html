@@ -1,0 +1,33 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>modify form</title>
+</head>
+<body>
+    <a href="/" class="back-link">← 返回列表</a>
+    
+    <div class="container">
+        <h2>修改工作委託內容</h2>
+        <form method="POST" action="/modifyPost/{{ post.id }}">
+            <div class="form-group">
+                <label for="title">名稱：*</label>
+                <input type="text" id="title" name="title" required value="{{ post.title }}">
+            </div>
+            
+            <div class="form-group">
+                <label for="content">內容概述：*</label>
+                <textarea id="content" name="content" required>{{ post.content }}</textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="price">預期報價：</label>
+                <input type="text" id="price" name="price" value="{{ post.price or '' }}">
+                <div class="hint">選填</div>
+            </div>
+            
+            <input type="submit" value="儲存修改">
+        </form>
+    </div>
+</body>
+</html>

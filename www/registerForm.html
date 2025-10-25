@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>註冊 - 工作委託平台</title>
+    <style>
+        /* 保持原有的 CSS 樣式 */
+        body {
+            font-family: "Microsoft JhengHei", Arial, sans-serif;
+            max-width: 500px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h2 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: bold;
+        }
+        input[type="text"],
+        input[type="password"],
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        input[type="submit"] {
+            width: 100%;
+            padding: 12px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+        .links {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .links a {
+            color: #2196F3;
+            text-decoration: none;
+        }
+        .links a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>註冊新帳號</h2>
+        <form method="POST" action="/sessionLogin.py/register">
+            <div class="form-group">
+                <label for="username">使用者名稱：</label>
+                <input type="text" name="username" id="username" required>
+            </div>
+
+            <div class="form-group">
+                <label for="account">帳號：</label>
+                <input type="text" name="account" id="account" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">密碼：</label>
+                <input type="password" name="password" id="password" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="role">角色：</label>
+                <select name="role" id="role" required>
+                    <option value="">請選擇角色</option>
+                    <option value="client">委託人（發案方）</option>
+                    <option value="contractor">接案人（承包方）</option>
+                </select>
+
+                <input type="submit" value="註冊">
+
+        </form>
+        
+        <div class="links">
+            已有帳號？<a href="./loginForm.html">前往登入</a>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FastAPI Template</title>
+  </head>
+  <body>
+<h1>工作委託具體內容</h1>
+<hr/>
+<p>
+名稱：{{post.title}} 
+</p>
+<p>
+編號：{{post.id}} 
+</p>
+<p>
+內容概述：{{post.content}} 
+</p>
+<p>
+預期報價：{{post.price}} 
+</p>
+<p>
+委託狀態：{{post.status}} 
+</p>
+<p>
+  <A href="/modifyPost/{{post.id}}.html">修改委託</a>
+</p>
+<p>
+<A href="/proposallist/{{post.id}}.html">查看報價</a>
+</p>
+<p>
+<A href="/uploads/{{post.filename}}">下載已提交之檔案：{{post.filename}}</a>
+</p>
+
+	<h2>上傳已完成之專案</h2>
+	<form action="/api/upload" method="post" enctype="multipart/form-data">
+		<input type="file" name="uploadedFile">
+		<input type="text" name="msg" value="{{post.id}}" >
+		<input type="submit" value="Upload">
+	</form>
+</body>
+</html>

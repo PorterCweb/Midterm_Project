@@ -1,0 +1,31 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>login form</title>
+     <!-- 引入同個資料夾下的 test.css 樣式檔案 -->
+    <link rel = "stylesheet" type = "test/css" href = "./style.css">
+</head>
+<body>
+    <div class="container">
+        <h2>工作委託平台</h2>
+        <form method="POST" action="/sessionLogin.py/login">
+            <div class="form-group">
+                <label for="account">帳號：</label>
+                <input type="text" name="account" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">密碼：</label>
+                <input type="text" name="password" required>
+            </div>
+            
+            <input type="submit" value="登入">
+        </form>
+        
+        <div class="links">
+            還沒有帳號？<a href="./registerForm.html">立即註冊</a>
+        </div>
+    </div>
+</body>
+</html>
