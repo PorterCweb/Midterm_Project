@@ -146,21 +146,21 @@
     <a href="/" class="back-link">← 返回列表</a>
     
     <div class="container">
-        <h1>{{ post.title }}</h1>
+        <h1>{{ postdetail.title }}</h1>
         
         <div class="info-row">
             <span class="info-label">編號：</span>
-            <span class="info-value">#{{ post.id }}</span>
+            <span class="info-value">#{{ postdetail.id }}</span>
         </div>
         
         <div class="info-row">
             <span class="info-label">狀態：</span>
-            <span class="status-badge status-{{ post.status }}">
-                {% if post.status == 'open' %}徵求中
-                {% elif post.status == 'assigned' %}已指派     
-                {% elif post.status == 'submitted' %}已提交
-                {% elif post.status == 'completed' %}已完成
-                {% elif post.status == 'rejected' %}已退件
+            <span class="status-badge status-{{ postdetail.status }}">
+                {% if postdetail.status == 'open' %}徵求中
+                {% elif postdetail.status == 'assigned' %}已指派     
+                {% elif postdetail.status == 'submitted' %}已提交
+                {% elif postdetail.status == 'completed' %}已完成
+                {% elif postdetail.status == 'rejected' %}已退件
                 {% endif %}
             </span>
         </div>
@@ -172,43 +172,42 @@
         
         <div class="info-row">
             <span class="info-label">接案人：</span>
-            {% if post.contractor == '尚未有接案人'%}
+            {% if postdetail.contractor == '尚未有接案人'%}
                 <span class="info-value">{{ 尚未有接案人 }}</span>
             {% else %}
-                <span class="info-value">{{ post.contractor }}</span>
+                <span class="info-value">{{ postdetail.contractor }}</span>
             {% endif %}
         </div>
         
-        {% if post.price %}
+        {% if postdetail.price %}
         <div class="info-row">
             <span class="info-label">預期報價：</span>
-            <span class="info-value">{{ post.price }}</span>
+            <span class="info-value">{{ postdetail.price }}</span>
         </div>
         {% endif %}
         
         <div class="section-title">內容概述</div>
         <div class="info-row">
-            {{ post.content }}
+            {{ postdetail.content }}
         </div>
         
-        {% if post.filename %}
+        {% if postdetail.filename %}
         <div class="section-title">提交的檔案</div>
         <div class="info-row">
-            <a href="/uploads/{{ post.filename }}" class="btn btn-primary">下載檔案：{{ post.filename }}</a>
+            <a href="/uploads/{{ postdetail.filename }}" class="btn btn-primary">下載檔案：{{ postdetail.filename }}</a>
         </div>
         {% endif %}
         
         <!-- 委託人功能 -->
-        {% if user and user.role == 'client' and post.client == user.username %}
-            
+        {% if user.role == 'client' and postdetail.client == user.username %}
             <!-- 顯示提案列表 -->
-            {% if proposals and post.status == 'open' %}
+            {% if postdetail.status == 'open' %}
             <div class="section-title">承包意願提案</div>
             <ul class="proposals-list">
                 {% for proposal in proposals %}
                 <li class="proposal-item">
                     <div class="proposal-header">
-                        <span class="contractor-name">{{ proposal.contractor_name }}</span>
+                        <span class="contractor-name">{{ proposal.proporser }}</span>
                         <span class="proposal-price">報價：{{ proposal.price }}</span>
                     </div>
                     {% if proposal.message %}
@@ -217,7 +216,7 @@
                     </div>
                     {% endif %}
                     <div style="margin-top: 10px;">
-                        <a href="/acceptProposal/{{ proposal.id }}/{{ post.id }}" 
+                        <a href="/acceptProposal/{{ proposal.id }}/{{ postdetail.id }}" 
                            class="btn btn-success"
                            onclick="return confirm('確定選擇 {{ proposal.contractor_name }} 作為接案人嗎？')">
                             選擇此接案人
@@ -226,21 +225,21 @@
                 </li>
                 {% endfor %}
             </ul>
-            {% elif post.status == 'open' %}
+            {% elif postdetail.status == 'open' %}
             <div class="info-row" style="color: #999;">
                 目前還沒有任何提案
             </div>
             {% endif %}
             
             <!-- 結案管理按鈕 -->
-            {% if post.status == 'submitted' %}
+            {% if postdetail.status == 'submitted' %}
             <div class="action-buttons">
-                <a href="/acceptSubmission/{{ post.id }}" 
+                <a href="/acceptSubmission/{{ postdetail.id }}" 
                    class="btn btn-success"
                    onclick="return confirm('確定接受結案嗎？')">
                     接受結案
                 </a>
-                <a href="/rejectSubmission/{{ post.id }}" 
+                <a href="/rejectSubmission/{{ postdetail.id }}" 
                    class="btn btn-danger"
                    onclick="return confirm('確定要退件嗎？')">
                     退件要求重做
@@ -253,35 +252,35 @@
         {% if user and user.role == 'contractor' %}
             
             <!-- 如果專案開放中，顯示提案按鈕 -->
-            {% if post.status == 'open' %}
+            {% if postdetail.status == 'open' %}
             <div class="action-buttons">
-                <a href="/proposalForm/{{ post.id }}.html" class="btn btn-success">
+                <a href="/proposalForm/{{ postdetail.id }}.html" class="btn btn-success">
                     提出承包意願
                 </a>
             </div>
             {% endif %}
             
             <!-- 如果是被指派的接案人，顯示上傳介面 -->
-            {% if post.assigned_to == user.id and post.status in ['assigned', 'rejected'] %}
+            {% if postdetail.assigned_to == user.id and postdetail.status in ['assigned', 'rejected'] %}
             <div class="upload-section">
                 <h3>上傳結案檔案</h3>
-                <form action="/api/upload" method="post" enctype="multipart/form-data">
+                <form action="/api/upload" method= postdetail" enctype="multipart/form-data">
                     <input type="file" name="uploadedFile" required>
-                    <input type="hidden" name="msg" value="{{ post.id }}">
+                    <input type="hidden" name="msg" value="{{ postdetail.id }}">
                     <input type="submit" value="上傳檔案" class="btn btn-success">
                 </form>
             </div>
             {% endif %}
             
             <!-- 如果已提交，等待委託人確認 -->
-            {% if post.assigned_to == user.id and post.status == 'submitted' %}
+            {% if postdetail.assigned_to == user.id and postdetail.status == 'submitted' %}
             <div class="info-row" style="background-color: #fff3cd; color: #856404;">
                 已提交結案檔案，等待委託人確認中...
             </div>
             {% endif %}
             
             <!-- 如果已完成 -->
-            {% if post.assigned_to == user.id and post.status == 'completed' %}
+            {% if postdetail.assigned_to == user.id and postdetail.status == 'completed' %}
             <div class="info-row" style="background-color: #d4edda; color: #155724;">
                 ✓ 此專案已順利完成結案
             </div>
@@ -290,3 +289,4 @@
     </div>
 </body>
 </html>
+ 

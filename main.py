@@ -116,12 +116,13 @@ def redirect():
 @app.get("/read/{id}")
 async def readPost(request: Request, id: int, conn=Depends(getDB)):
     postDetail = await posts.getPost(conn, id)
+    proposals = await posts.GetProposalFromID(conn, id)
     user = {
         "username": request.session.get("user"),
         "account": request.session.get("account"),
         "role": request.session.get("role")
     }
-    return templates.TemplateResponse("postDetail.html", {"request": request, "user": user, "post": postDetail})
+    return templates.TemplateResponse("postDetail.html", {"request": request, "user": user, "postdetail": postDetail, "proposals": proposals})
 
 @app.get("/readProposer/{id}")
 async def readProposer(request: Request, id: int, conn=Depends(getDB)):

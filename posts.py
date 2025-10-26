@@ -10,21 +10,22 @@ async def getList(conn):
 
 async def getPost(conn, id):
 	async with conn.cursor() as cur:
-		sql="select id ,title, content, price, filename, status from posts where id=%s;"
+		sql="select * from posts where id = %s;"
 		await cur.execute(sql,(id,))
 		row = await cur.fetchone()
 		return row
 	
 async def GetProposalFromID(conn, id):
 	async with conn.cursor() as cur:
-		sql="select id, proposer, quote, question from proposals where id=%s;"
+		sql="select * from proposals where id = %s;"
 		await cur.execute(sql,(id,))
 		rows = await cur.fetchall()
+		print(rows)
 		return rows
 
 async def deletePost(conn, id):
 	async with conn.cursor() as cur:
-		sql="delete from posts where id=%s;"
+		sql="delete from posts where id = %s;"
 		await cur.execute(sql,(id,))
 		return True
 	
