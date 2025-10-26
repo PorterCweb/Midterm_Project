@@ -47,7 +47,6 @@ async def login(
 ):
     # 從資料庫查詢使用者
     user = await posts.getUsers(conn,account)
-
     # 驗證使用者
     if user and user["password"] == password:
         # 登入成功，將使用者資訊存入 Session
@@ -56,13 +55,14 @@ async def login(
         request.session["role"] = user["role"]
         # 判別使用者身分及導入至不同介面
         if request.session["role"] == "client":
-            return RedirectResponse(url="/clientForm.html", status_code=302)
+            postLists = await posts.getList(conn)
+            return templates.TemplateResponse("clientForm.html", {"request": request, "user": user, "postLists": postLists})
         else:
-            return RedirectResponse(url="/contractorForm.html", status_code=302)
+            return templates.TemplateResponse("contractorForm.html", {"request": request, "user": user})
     else:
         # 登入失敗
         return HTMLResponse(
-			"帳號或密碼錯誤 <a href='/loginForm.html'>重新登入</a>", 
+			"帳號或密碼錯誤 <a href='/loginForm.html'> 重新登入</a>", 
 			status_code=401
 		)
 
@@ -90,8 +90,7 @@ async def logout(request: Request):
 @app.get("/")
 async def root(request: Request, conn=Depends(getDB)):
     # 可選：加入登入驗證 user: str = Depends(get_current_user)
-    myList = await posts.getList(conn)
-    return templates.TemplateResponse("postList.html", {"request": request, "items": myList})
+    return RedirectResponse(url="/loginForm.html")
 
 @app.get("/file/{p:path}")
 async def getPath(p: str):
@@ -163,8 +162,9 @@ async def addPost(
     price: str=Form(...),
     conn=Depends(getDB)
 ):
-    await posts.addPost(conn, title, content, price)
-    return RedirectResponse(url="/", status_code=302)
+    status = "open"
+    await posts.addPost(conn, title, content, price, status)
+    return RedirectResponse(url="/clientForm.html", status_code=302)
 
 
 

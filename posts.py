@@ -19,7 +19,7 @@ async def GetProposalFromID(conn, id):
 	async with conn.cursor() as cur:
 		sql="select id, proposer, quote, question from proposals where id=%s;"
 		await cur.execute(sql,(id,))
-		rows = await cur.fetchal()
+		rows = await cur.fetchall()
 		return rows
 
 async def deletePost(conn, id):
@@ -40,10 +40,10 @@ async def acceptproposal(conn, id):
 		await cur.execute(sql,(id,))
 		return True
 
-async def addPost(conn, title, content, price):
+async def addPost(conn, title, content, price, status):
 	async with conn.cursor() as cur:
-		sql="insert into posts (title,content,price) values (%s,%s,%s);"
-		await cur.execute(sql,(title,content,price,))
+		sql="insert into posts (title, content, price, status) values (%s,%s,%s,%s);"
+		await cur.execute(sql,(title,content,price,status))
 		return True
 
 async def setUploadFile(conn, id, filename):

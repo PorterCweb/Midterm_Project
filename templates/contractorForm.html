@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FastAPI Template</title>
+  </head>
+  <body>
+<h1>工作委託列表</h1>
+Hello {{user.username}}
+<hr/>
+<ol>
+	{% for postList in postLists %}
+	<li>
+	<a href="/read/{{item.id}}"> {{ postList.title }}</a> <a href="/delete/{{item.id}}">刪除委託</a> 
+	</li>
+	{% endfor %}
+</ol>
+</body>
+</html>
