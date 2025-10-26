@@ -154,9 +154,10 @@ async def acceptprops(request: Request, id: int, conn=Depends(getDB)):
     await posts.acceptproposal(conn, id)
     return RedirectResponse(url="/", status_code=302)
 
-@app.post("/addPost")
+@app.post("/addPost/{user}")
 async def addPost(
     request: Request,
+    user: list,
     title: str=Form(...),
     content: str=Form(...),
     price: str=Form(...),
@@ -164,7 +165,9 @@ async def addPost(
 ):
     status = "open"
     await posts.addPost(conn, title, content, price, status)
-    return RedirectResponse(url="/clientForm.html", status_code=302)
+    postLists = await posts.getList(conn)
+    print("sdfsd")
+    return templates.TemplateResponse("clientForm.html", {"request": request, "user": user, "postLists": postLists})
 
 
 
