@@ -14,21 +14,12 @@ async def getPost(conn, id):
 		await cur.execute(sql,(id,))
 		row = await cur.fetchone()
 		return row
-
-async def postStatus(conn,id):
-	async with conn.cursor() as cur:
-		sql = "select status FROM posts WHERE id = %s"
-		y = await cur.execute(sql,(id,))
-		if y == '尚未有人接案':
-			return False
-		else:
-			return True
 	
 async def GetProposalFromID(conn, id):
 	async with conn.cursor() as cur:
 		sql="select id, proposer, quote, question from proposals where id=%s;"
 		await cur.execute(sql,(id,))
-		rows = await cur.fetchall()
+		rows = await cur.fetchal()
 		return rows
 
 async def deletePost(conn, id):
@@ -67,12 +58,12 @@ async def register(conn, username, account, password, role):
 		await cur.execute(sql,(username, account, password, role))
 		return True
 
-async def getUsers(conn, username):
+async def getUsers(conn, account):
 	async with conn.cursor() as cur:
-		sql = "SELECT * FROM users Where username = %s"
-		await cur.execute(sql,(username))
-		rows = await cur.fetchall()
-		return rows
+		sql = "SELECT * FROM users Where account = %s"
+		await cur.execute(sql,(account,))
+		row = await cur.fetchone()
+		return row
 	
 
 		

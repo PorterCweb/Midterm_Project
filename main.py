@@ -46,24 +46,26 @@ async def login(
     conn = Depends(getDB)
 ):
     # 從資料庫查詢使用者
-    async with conn.cursor() as cur:
-        sql = "SELECT username, account, password, role FROM users WHERE account = %s"
-        await cur.execute(sql, (account,))
-        user = await cur.fetchone()
-    
+    user = await posts.getUsers(conn,account)
+
     # 驗證使用者
     if user and user["password"] == password:
         # 登入成功，將使用者資訊存入 Session
         request.session["user"] = user["username"]
         request.session["account"] = user["account"]
         request.session["role"] = user["role"]
-        return RedirectResponse(url="/", status_code=302)
-    
-    # 登入失敗
-    return HTMLResponse(
-        "帳號或密碼錯誤 <a href='/loginForm.html'>重新登入</a>", 
-        status_code=401
-    )
+        # 判別使用者身分及導入至不同介面
+        if request.session["role"] == "client":
+            return RedirectResponse(url="/clientForm.html", status_code=302)
+        else:
+            return RedirectResponse(url="/contractorForm.html", status_code=302)
+    else:
+        # 登入失敗
+        return HTMLResponse(
+			"帳號或密碼錯誤 <a href='/loginForm.html'>重新登入</a>", 
+			status_code=401
+		)
+
 
 # ===== 新增：註冊路由 =====
 @app.post("/register")
@@ -115,7 +117,7 @@ async def readProposer(request: Request, id: int, conn=Depends(getDB)):
 
 @app.get("/delete/{id}")
 async def delPost(request: Request, id: int, conn=Depends(getDB)):
-    postDetail = await posts.deletePost(conn, id)
+    await posts.deletePost(conn, id)
     return RedirectResponse(url="/", status_code=302)
 
 @app.get("/modifyPost/{id}.html")
@@ -135,17 +137,17 @@ async def modify_Post(
     price: str=Form(...),
     conn=Depends(getDB)
 ):
-    postDetail = await posts.modifyPost(conn, title, content, price, id)
+    await posts.modifyPost(conn, title, content, price, id)
     return RedirectResponse(url="/", status_code=302)
 
 @app.get("/proposallist/{id}.html")
 async def postStat(request: Request, id: int, conn=Depends(getDB)):
     proposal = await posts.GetProposalFromID(conn, id)
-    status = await posts.postStatus(conn, id)
+    post = await posts.getPost(conn, id)
     return templates.TemplateResponse("proposallist.html", {
         "request": request,
         "proposal": proposal,
-        "status": status
+        "post": post
     })
 
 @app.get("/acceptproposal/{id}")
@@ -161,7 +163,9 @@ async def addPost(
     price: str=Form(...),
     conn=Depends(getDB)
 ):
-    postDetail = await posts.addPost(conn, title, content, price)
+    await posts.addPost(conn, title, content, price)
     return RedirectResponse(url="/", status_code=302)
+
+
 
 app.mount("/", StaticFiles(directory="www"))

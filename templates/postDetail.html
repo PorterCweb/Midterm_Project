@@ -10,27 +10,38 @@
 <h1>工作委託具體內容</h1>
 <hr/>
 <p>
-名稱：{{post.title}} 
+  名稱：{{post.title}} 
 </p>
 <p>
-編號：{{post.id}} 
+  編號：{{post.id}} 
 </p>
 <p>
-內容概述：{{post.content}} 
+  內容概述：{{post.content}} 
 </p>
 <p>
-預期報價：{{post.price}} 
+  預期報價：{{post.price}} 
 </p>
 <p>
-委託狀態：{{post.status}} 
+  委託狀態：
+  {% if post.status == '尚未有人接案' %} 
+  {{post.status}} 
+  {% else %} 
+  <span style="color: green; font-weight: bold;">✓ 已有人接案</span> 
+  {% endif %}
 </p>
 <p>
+  {% if post.status == '尚未有人接案' %}
   <A href="/modifyPost/{{post.id}}.html">修改委託</a>
+  {% else %}
+    <span>無法修改委託</span>
+  {% endif %}
 </p>
 <p>
-  {% if {{specificpost.status}} %}
-  <A href="/proposallist/{{post.id}}.html">查看報價</a>
-  {%else%}
+  {% if post.status == '尚未有人接案' %}
+    <a href="/proposallist/{{post.id}}.html">查看報價</a>
+  {% else %}
+    <a href="/proposalDetail/{{post.id}}">查案委託內容</a>
+  {% endif %}
 </p>
 <p>
 <A href="/uploads/{{post.filename}}">下載已提交之檔案：{{post.filename}}</a>

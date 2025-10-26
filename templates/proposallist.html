@@ -10,7 +10,7 @@
 <h1>報價人列表</h1>
 <hr/>
 <ol>
-	{% for case in post %}
+	{% for case in proposal %}
     {{case.proposer }}  {{case.quote}}  {{case.question}}
 	  <li>
       <a href="/acceptproposal/{{case.id}}">接受報價</a>
