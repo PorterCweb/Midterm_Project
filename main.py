@@ -90,7 +90,16 @@ async def logout(request: Request):
 @app.get("/")
 async def root(request: Request, conn=Depends(getDB)):
     # 可選：加入登入驗證 user: str = Depends(get_current_user)
-    return RedirectResponse(url="/loginForm.html")
+    user = {
+            "username": request.session.get("user"),
+            "account": request.session.get("account"),
+            "role": request.session.get("role")
+        }
+    if user["role"] == "client":
+            postLists = await posts.getList(conn)
+            return templates.TemplateResponse("clientForm.html", {"request": request, "user": user, "postLists": postLists})
+    else:
+        pass
 
 @app.get("/file/{p:path}")
 async def getPath(p: str):
@@ -107,7 +116,12 @@ def redirect():
 @app.get("/read/{id}")
 async def readPost(request: Request, id: int, conn=Depends(getDB)):
     postDetail = await posts.getPost(conn, id)
-    return templates.TemplateResponse("postDetail.html", {"request": request, "post": postDetail})
+    user = {
+        "username": request.session.get("user"),
+        "account": request.session.get("account"),
+        "role": request.session.get("role")
+    }
+    return templates.TemplateResponse("postDetail.html", {"request": request, "user": user, "post": postDetail})
 
 @app.get("/readProposer/{id}")
 async def readProposer(request: Request, id: int, conn=Depends(getDB)):
@@ -154,21 +168,18 @@ async def acceptprops(request: Request, id: int, conn=Depends(getDB)):
     await posts.acceptproposal(conn, id)
     return RedirectResponse(url="/", status_code=302)
 
-@app.post("/addPost/{user}")
+@app.post("/addPost")
 async def addPost(
     request: Request,
-    user: list,
     title: str=Form(...),
     content: str=Form(...),
     price: str=Form(...),
     conn=Depends(getDB)
 ):
     status = "open"
-    await posts.addPost(conn, title, content, price, status)
-    postLists = await posts.getList(conn)
-    print("sdfsd")
-    return templates.TemplateResponse("clientForm.html", {"request": request, "user": user, "postLists": postLists})
-
+    client = request.session.get("user")
+    await posts.addPost(conn, title, content, price, status, client)
+    return RedirectResponse(url="/", status_code=302)
 
 
 app.mount("/", StaticFiles(directory="www"))

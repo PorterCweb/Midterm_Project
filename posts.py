@@ -40,10 +40,10 @@ async def acceptproposal(conn, id):
 		await cur.execute(sql,(id,))
 		return True
 
-async def addPost(conn, title, content, price, status):
+async def addPost(conn, title, content, price, status,client):
 	async with conn.cursor() as cur:
-		sql="insert into posts (title, content, price, status) values (%s,%s,%s,%s);"
-		await cur.execute(sql,(title,content,price,status))
+		sql="insert into posts (title, content, price, status, client) values (%s,%s,%s,%s,%s);"
+		await cur.execute(sql,(title,content,price,status,client))
 		return True
 
 async def setUploadFile(conn, id, filename):

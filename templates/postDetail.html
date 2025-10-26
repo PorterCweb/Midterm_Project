@@ -1,57 +1,292 @@
 <!DOCTYPE html>
 <html lang="zh-Hant-TW">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>FastAPI Template</title>
-  </head>
-  <body>
-<h1>工作委託具體內容</h1>
-<hr/>
-<p>
-  名稱：{{post.title}} 
-</p>
-<p>
-  編號：{{post.id}} 
-</p>
-<p>
-  內容概述：{{post.content}} 
-</p>
-<p>
-  預期報價：{{post.price}} 
-</p>
-<p>
-  委託狀態：
-  {% if post.status == '尚未有人接案' %} 
-  {{post.status}} 
-  {% else %} 
-  <span style="color: green; font-weight: bold;">✓ 已有人接案</span> 
-  {% endif %}
-</p>
-<p>
-  {% if post.status == '尚未有人接案' %}
-  <A href="/modifyPost/{{post.id}}.html">修改委託</a>
-  {% else %}
-    <span>無法修改委託</span>
-  {% endif %}
-</p>
-<p>
-  {% if post.status == '尚未有人接案' %}
-    <a href="/proposallist/{{post.id}}.html">查看報價</a>
-  {% else %}
-    <a href="/proposalDetail/{{post.id}}">查案委託內容</a>
-  {% endif %}
-</p>
-<p>
-<A href="/uploads/{{post.filename}}">下載已提交之檔案：{{post.filename}}</a>
-</p>
-
-	<h2>上傳已完成之專案</h2>
-	<form action="/api/upload" method="post" enctype="multipart/form-data">
-		<input type="file" name="uploadedFile">
-		<input type="text" name="msg" value="{{post.id}}" >
-		<input type="submit" value="Upload">
-	</form>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>專案詳情</title>
+    <style>
+        body {
+            font-family: "Microsoft JhengHei", Arial, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        h1 {
+            color: #333;
+            border-bottom: 2px solid #2196F3;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .info-row {
+            margin-bottom: 15px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+        }
+        .info-label {
+            font-weight: bold;
+            color: #555;
+            display: inline-block;
+            width: 100px;
+        }
+        .info-value {
+            color: #333;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .status-open { background-color: #4CAF50; color: white; }
+        .status-assigned { background-color: #2196F3; color: white; }
+        .status-submitted { background-color: #FF9800; color: white; }
+        .status-completed { background-color: #9E9E9E; color: white; }
+        .status-rejected { background-color: #f44336; color: white; }
+        
+        .section-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            border-left: 4px solid #2196F3;
+            padding-left: 10px;
+        }
+        .proposals-list {
+            list-style: none;
+            padding: 0;
+        }
+        .proposal-item {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            background-color: #fafafa;
+        }
+        .proposal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .contractor-name {
+            font-weight: bold;
+            color: #2196F3;
+        }
+        .proposal-price {
+            color: #4CAF50;
+            font-weight: bold;
+        }
+        .proposal-message {
+            color: #666;
+            margin-top: 10px;
+        }
+        .btn {
+            display: inline-block;
+            padding: 8px 15px;
+            margin: 5px;
+            border: none;
+            border-radius: 4px;
+            text-decoration: none;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .btn-primary {
+            background-color: #2196F3;
+            color: white;
+        }
+        .btn-success {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .btn-danger {
+            background-color: #f44336;
+            color: white;
+        }
+        .btn-warning {
+            background-color: #FF9800;
+            color: white;
+        }
+        .btn:hover {
+            opacity: 0.9;
+        }
+        .upload-section {
+            background-color: #f0f8ff;
+            padding: 20px;
+            border-radius: 4px;
+            margin-top: 20px;
+        }
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #2196F3;
+            text-decoration: none;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        .action-buttons {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+    </style>
+</head>
+<body>
+    <a href="/" class="back-link">← 返回列表</a>
+    
+    <div class="container">
+        <h1>{{ post.title }}</h1>
+        
+        <div class="info-row">
+            <span class="info-label">編號：</span>
+            <span class="info-value">#{{ post.id }}</span>
+        </div>
+        
+        <div class="info-row">
+            <span class="info-label">狀態：</span>
+            <span class="status-badge status-{{ post.status }}">
+                {% if post.status == 'open' %}徵求中
+                {% elif post.status == 'assigned' %}已指派     
+                {% elif post.status == 'submitted' %}已提交
+                {% elif post.status == 'completed' %}已完成
+                {% elif post.status == 'rejected' %}已退件
+                {% endif %}
+            </span>
+        </div>
+        
+        <div class="info-row">
+            <span class="info-label">委託人：</span>
+            <span class="info-value">{{ user.username }}</span>
+        </div>
+        
+        <div class="info-row">
+            <span class="info-label">接案人：</span>
+            {% if post.contractor == '尚未有接案人'%}
+                <span class="info-value">{{ 尚未有接案人 }}</span>
+            {% else %}
+                <span class="info-value">{{ post.contractor }}</span>
+            {% endif %}
+        </div>
+        
+        {% if post.price %}
+        <div class="info-row">
+            <span class="info-label">預期報價：</span>
+            <span class="info-value">{{ post.price }}</span>
+        </div>
+        {% endif %}
+        
+        <div class="section-title">內容概述</div>
+        <div class="info-row">
+            {{ post.content }}
+        </div>
+        
+        {% if post.filename %}
+        <div class="section-title">提交的檔案</div>
+        <div class="info-row">
+            <a href="/uploads/{{ post.filename }}" class="btn btn-primary">下載檔案：{{ post.filename }}</a>
+        </div>
+        {% endif %}
+        
+        <!-- 委託人功能 -->
+        {% if user and user.role == 'client' and post.client == user.username %}
+            
+            <!-- 顯示提案列表 -->
+            {% if proposals and post.status == 'open' %}
+            <div class="section-title">承包意願提案</div>
+            <ul class="proposals-list">
+                {% for proposal in proposals %}
+                <li class="proposal-item">
+                    <div class="proposal-header">
+                        <span class="contractor-name">{{ proposal.contractor_name }}</span>
+                        <span class="proposal-price">報價：{{ proposal.price }}</span>
+                    </div>
+                    {% if proposal.message %}
+                    <div class="proposal-message">
+                        訊息：{{ proposal.message }}
+                    </div>
+                    {% endif %}
+                    <div style="margin-top: 10px;">
+                        <a href="/acceptProposal/{{ proposal.id }}/{{ post.id }}" 
+                           class="btn btn-success"
+                           onclick="return confirm('確定選擇 {{ proposal.contractor_name }} 作為接案人嗎？')">
+                            選擇此接案人
+                        </a>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+            {% elif post.status == 'open' %}
+            <div class="info-row" style="color: #999;">
+                目前還沒有任何提案
+            </div>
+            {% endif %}
+            
+            <!-- 結案管理按鈕 -->
+            {% if post.status == 'submitted' %}
+            <div class="action-buttons">
+                <a href="/acceptSubmission/{{ post.id }}" 
+                   class="btn btn-success"
+                   onclick="return confirm('確定接受結案嗎？')">
+                    接受結案
+                </a>
+                <a href="/rejectSubmission/{{ post.id }}" 
+                   class="btn btn-danger"
+                   onclick="return confirm('確定要退件嗎？')">
+                    退件要求重做
+                </a>
+            </div>
+            {% endif %}
+        {% endif %}
+        
+        <!-- 接案人功能 -->
+        {% if user and user.role == 'contractor' %}
+            
+            <!-- 如果專案開放中，顯示提案按鈕 -->
+            {% if post.status == 'open' %}
+            <div class="action-buttons">
+                <a href="/proposalForm/{{ post.id }}.html" class="btn btn-success">
+                    提出承包意願
+                </a>
+            </div>
+            {% endif %}
+            
+            <!-- 如果是被指派的接案人，顯示上傳介面 -->
+            {% if post.assigned_to == user.id and post.status in ['assigned', 'rejected'] %}
+            <div class="upload-section">
+                <h3>上傳結案檔案</h3>
+                <form action="/api/upload" method="post" enctype="multipart/form-data">
+                    <input type="file" name="uploadedFile" required>
+                    <input type="hidden" name="msg" value="{{ post.id }}">
+                    <input type="submit" value="上傳檔案" class="btn btn-success">
+                </form>
+            </div>
+            {% endif %}
+            
+            <!-- 如果已提交，等待委託人確認 -->
+            {% if post.assigned_to == user.id and post.status == 'submitted' %}
+            <div class="info-row" style="background-color: #fff3cd; color: #856404;">
+                已提交結案檔案，等待委託人確認中...
+            </div>
+            {% endif %}
+            
+            <!-- 如果已完成 -->
+            {% if post.assigned_to == user.id and post.status == 'completed' %}
+            <div class="info-row" style="background-color: #d4edda; color: #155724;">
+                ✓ 此專案已順利完成結案
+            </div>
+            {% endif %}
+        {% endif %}
+    </div>
 </body>
 </html>
