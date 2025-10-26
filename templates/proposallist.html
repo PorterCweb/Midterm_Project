@@ -11,13 +11,10 @@
 <hr/>
 <ol>
 	{% for case in post %}
-	<li>
     {{case.proposer }}  {{case.quote}}  {{case.question}}
-    {% if {{specificpost.status}} == '尚未有人接案' %}
+	  <li>
       <a href="/acceptproposal/{{case.id}}">接受報價</a>
-    {%else%}
-    {% endif %}
-	</li>
+	  </li>
 	{% endfor %}
 </ol>
 </body>

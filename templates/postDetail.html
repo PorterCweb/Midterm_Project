@@ -28,7 +28,9 @@
   <A href="/modifyPost/{{post.id}}.html">修改委託</a>
 </p>
 <p>
-<A href="/proposallist/{{post.id}}.html">查看報價</a>
+  {% if {{specificpost.status}} %}
+  <A href="/proposallist/{{post.id}}.html">查看報價</a>
+  {%else%}
 </p>
 <p>
 <A href="/uploads/{{post.filename}}">下載已提交之檔案：{{post.filename}}</a>

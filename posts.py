@@ -15,12 +15,14 @@ async def getPost(conn, id):
 		row = await cur.fetchone()
 		return row
 
-async def getSpecificPost(conn,id):
+async def postStatus(conn,id):
 	async with conn.cursor() as cur:
-		sql = "select * FROM posts WHERE id = %s"
-		await cur.execute(sql,(id,))
-		row = await cur.fetchone()
-		return row
+		sql = "select status FROM posts WHERE id = %s"
+		y = await cur.execute(sql,(id,))
+		if y == '尚未有人接案':
+			return False
+		else:
+			return True
 	
 async def GetProposalFromID(conn, id):
 	async with conn.cursor() as cur:

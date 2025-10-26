@@ -139,13 +139,13 @@ async def modify_Post(
     return RedirectResponse(url="/", status_code=302)
 
 @app.get("/proposallist/{id}.html")
-async def propsform(request: Request, id: int, conn=Depends(getDB)):
+async def postStat(request: Request, id: int, conn=Depends(getDB)):
     proposal = await posts.GetProposalFromID(conn, id)
-    specificpost = await posts.getSpecificPost(conn, id)
+    status = await posts.postStatus(conn, id)
     return templates.TemplateResponse("proposallist.html", {
         "request": request,
         "proposal": proposal,
-        "specificpost": specificpost
+        "status": status
     })
 
 @app.get("/acceptproposal/{id}")
