@@ -8,7 +8,7 @@ async def getList(conn):
 		rows = await cur.fetchall()
 		return rows
 
-async def getPost(conn, id):
+async def getPostFromID(conn, id):
 	async with conn.cursor() as cur:
 		sql="select * from posts where id = %s;"
 		await cur.execute(sql,(id,))
@@ -47,7 +47,7 @@ async def acceptProposal(conn, id, proposer, quote, status):
 		await cur.execute(sql,(status, proposer, quote, id,))
 		return True
 
-async def addPost(conn, title, content, expectedquotation, status,client):
+async def addPost(conn, title, content, expectedquotation, status, client):
 	async with conn.cursor() as cur:
 		sql="insert into posts (title, content, expectedquotation, status, client) values (%s,%s,%s,%s,%s);"
 		await cur.execute(sql,(title,content,expectedquotation,status,client))
@@ -72,10 +72,8 @@ async def getUsers(conn, account):
 		row = await cur.fetchone()
 		return row
 	
-
-		
-
-
-
-
-
+async def submitproposal(conn, id, proposer, quote, message):
+	async with conn.cursor() as cur:
+		sql = "insert into proposals (id, proposer, quote, message) values (%s,%s,%s,%s)"
+		await cur.execute(sql,(id,proposer,quote,message,))
+		return True

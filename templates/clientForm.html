@@ -179,12 +179,12 @@
     <div class="content">
         {% if postLists %}
         <ul class="post-list">
-            我的提案
+            <h2>專案</h2>
             {% for postList in postLists %}
                 {% if postList.client == user.username%}
                     <li class="post-postList">
                         <div class="post-info">
-                            <a href="/read/{{ postList.id }}" class="post-title">{{ postList.title }}</a>
+                            <a href="/postDetail/{{ postList.id }}" class="post-title">{{ postList.title }}</a>
                             <div class="post-meta">
                                 {% if postList.status %}
                                 <span class="post-status status-{{ postList.status }}">

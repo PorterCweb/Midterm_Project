@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>新增工作委託</title>
+    <title>提出承包意願</title>
     <style>
         body {
             font-family: "Microsoft JhengHei", Arial, sans-serif;
@@ -21,6 +21,20 @@
         h2 {
             color: #333;
             margin-bottom: 30px;
+        }
+        .project-info {
+            background-color: #f0f8ff;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 30px;
+        }
+        .project-info h3 {
+            margin-top: 0;
+            color: #2196F3;
+        }
+        .project-info p {
+            margin: 5px 0;
+            color: #666;
         }
         .form-group {
             margin-bottom: 20px;
@@ -42,7 +56,7 @@
             font-family: "Microsoft JhengHei", Arial, sans-serif;
         }
         textarea {
-            min-height: 120px;
+            min-height: 100px;
             resize: vertical;
         }
         input[type="submit"] {
@@ -76,29 +90,33 @@
     </style>
 </head>
 <body>
-    <a href="/homepage" class="back-link">← 返回列表</a>
+    <a href="/postDetail/{{ post.id }}" class="back-link">← 返回專案詳情</a>
     
     <div class="container">
-        <h2>新增工作委託</h2>
-        <form method="POST" action="/addPost">
+        <h2>提出承包意願</h2>
+        
+        <div class="project-info">
+            <h3>{{ post.title }}</h3>
+            <p><strong>內容：</strong>{{ post.content }}</p>
+            {% if post.expectedquotation %}
+            <p><strong>預期報價：</strong>{{ post.expectedquotation }}</p>
+            {% endif %}
+        </div>
+        
+        <form method="POST" action="/submitProposal/{{ post.id }}/{{ user.username }}">
             <div class="form-group">
-                <label for="title">名稱：*</label>
-                <input type="text" id="title" name="title" required placeholder="例如：網站開發專案">
+                <label for="quote">您的報價：*</label>
+                <input type="text" id="quote" name="quote" required placeholder="例如：NT$ 45,000">
+                <div class="hint">請填寫您願意承接此專案的價格</div>
             </div>
             
             <div class="form-group">
-                <label for="content">內容概述：*</label>
-                <textarea id="content" name="content" required placeholder="詳細描述您的需求..."></textarea>
-                <div class="hint">請詳細描述工作內容、需求、期望等</div>
+                <label for="message">提案訊息：</label>
+                <textarea id="message" name="message" placeholder="向委託人介紹您的經驗、優勢或其他想說的話..."></textarea>
+                <div class="hint">選填，但建議填寫以提高被選中的機會</div>
             </div>
             
-            <div class="form-group">
-                <label for="expectedquotation">預期報價：</label>
-                <input type="text" id="expectedquotation" name="expectedquotation" placeholder="例如：NT$ 50,000">
-                <div class="hint">選填，可以留空讓接案人報價</div>
-            </div>
-            
-            <input type="submit" value="發布委託">
+            <input type="submit" value="提交提案">
         </form>
     </div>
 </body>

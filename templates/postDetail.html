@@ -143,7 +143,7 @@
     </style>
 </head>
 <body>
-    <a href="/client" class="back-link">← 返回列表</a>
+    <a href="/homepage" class="back-link">← 返回列表</a>
     
     <div class="container">
         <h1>{{ postdetail.title }}</h1>
@@ -167,7 +167,7 @@
         
         <div class="info-row">
             <span class="info-label">委託人：</span>
-            <span class="info-value">{{ user.username }}</span>
+            <span class="info-value">{{ postdetail.client }}</span>
         </div>
         
         <div class="info-row">

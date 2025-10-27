@@ -179,12 +179,12 @@
     <div class="content">
         {% if postLists %}
         <ul class="post-list">
-            <h2>我的報價</h2>
+            <h2>專案</h2>
             {% for postList in postLists %}
-              {% if postList.contractor == '尚未有接案人' or user.username %}
+              {% if postList.status == 'open' or postList.contractor == user.username %}
                 <li class="post-postList">
                     <div class="post-info">
-                        <a href="/read/{{ postList.id }}" class="post-title">{{ postList.title }}</a>
+                        <a href="/postDetail/{{ postList.id }}" class="post-title">{{ postList.title }}</a>
                         <div class="post-meta">
                             {% if postList.status %}
                             <span class="post-status status-{{ postList.status }}">

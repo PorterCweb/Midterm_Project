@@ -105,9 +105,9 @@ async def getParam(a: int, b: int=5, c: str | None=None):
 def redirect():
     return RedirectResponse(url="/", status_code=302)
 
-@app.get("/read/{id}")
+@app.get("/postDetail/{id}")
 async def readPost(request: Request, id: int, conn=Depends(getDB)):
-    postDetail = await posts.getPost(conn, id)
+    postDetail = await posts.getProposalFromID(conn, id)
     proposals = await posts.getProposals(conn)
     user = {
         "username": request.session.get("user"),
@@ -116,11 +116,6 @@ async def readPost(request: Request, id: int, conn=Depends(getDB)):
     }
     return templates.TemplateResponse("postDetail.html", {"request": request, "user": user, "postdetail": postDetail, "proposals": proposals})
 
-@app.get("/readProposer/{id}")
-async def readProposer(request: Request, id: int, conn=Depends(getDB)):
-    postDetail = await posts.getProposalFromID(conn, id)
-    return templates.TemplateResponse("proposallist.html", {"request": request, "post": postDetail})
-
 @app.get("/delete/{id}")
 async def delPost(request: Request, id: int, conn=Depends(getDB)):
     await posts.deletePost(conn, id)
@@ -128,7 +123,7 @@ async def delPost(request: Request, id: int, conn=Depends(getDB)):
 
 @app.get("/modifyPost/{id}.html")
 async def modify_get_form(request: Request, id: int, conn=Depends(getDB)):
-    post = await posts.getPost(conn, id)
+    post = await posts.getProposalFromID(conn, id)
     return templates.TemplateResponse("modifyPost.html", {
         "request": request,
         "post": post,
@@ -146,14 +141,20 @@ async def modify_Post(
     await posts.modifyPost(conn, title, content, price, id)
     return RedirectResponse(url="/", status_code=302)
 
-@app.get("/proposalList/{id}.html")
+@app.get("/proposalForm/{id}.html")
 async def postStat(request: Request, id: int, conn=Depends(getDB)):
     proposal = await posts.getProposalFromID(conn, id)
-    post = await posts.getPost(conn, id)
-    return templates.TemplateResponse("proposallist.html", {
+    postdetail = await posts.getPostFromID(conn,id)
+    user = {
+        "username": request.session.get("user"),
+        "account": request.session.get("account"),
+        "role": request.session.get("role")
+    }
+    return templates.TemplateResponse("proposalForm.html", {
         "request": request, 
         "proposal": proposal,
-        "post": post
+        "postdetail": postdetail,
+        "user": user
     })
 
 @app.get("/acceptProposal/{id}/{proposer}/{quote}")
@@ -167,16 +168,16 @@ async def addPost(
     request: Request,
     title: str=Form(...),
     content: str=Form(...),
-    price: str=Form(...),
+    expectedquotation: str=Form(...),
     conn=Depends(getDB)
 ):
     status = "open"
     client = request.session.get("user")
-    await posts.addPost(conn, title, content, price, status, client)
-    return RedirectResponse(url="/client", status_code=302)
+    await posts.addPost(conn, title, content, expectedquotation, status, client)
+    return RedirectResponse(url="/homepage", status_code=302)
 
-@app.get("/client")
-async def acceptprops(request: Request, conn=Depends(getDB)):
+@app.get("/homepage")
+async def acceptprop(request: Request, conn=Depends(getDB)):
     user = {
             "username": request.session.get("user"),
             "account": request.session.get("account"),
@@ -187,6 +188,18 @@ async def acceptprops(request: Request, conn=Depends(getDB)):
         return templates.TemplateResponse("clientForm.html", {"request": request, "user": user, "postLists": postLists})
     else:
         postLists = await posts.getList(conn)
-        return templates.TemplateResponse("clientForm.html", {"request": request, "user": user, "postLists": postLists})
+        return templates.TemplateResponse("contractorForm.html", {"request": request, "user": user, "postLists": postLists})
+
+@app.post("/submitproposal/{id}/{username}")
+async def submitprop(
+    request:Request, 
+    id: int, 
+    username: str,
+    quote: int,
+    message: str,
+    conn =Depends(getDB)
+):
+    await posts.submitproposal(id, username, quote, message)
+    return RedirectResponse(url="/homepage", status_code=302)
 
 app.mount("/", StaticFiles(directory="www"))
