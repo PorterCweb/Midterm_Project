@@ -259,20 +259,37 @@
         <!-- 接案人功能 -->
         {% if user and user.role == 'contractor' %}
             
-            <!-- 如果專案開放中，顯示提案按鈕 -->
+            <!-- 如果專案開放中，檢查是否已報價 -->
             {% if postdetail.status == 'open' %}
-            <div class="action-buttons">
-                <a href="/proposalForm/{{ postdetail.id }}.html" class="btn btn-success">
-                    提出承包意願
-                </a>
-            </div>
+                {% set ns = namespace(has_proposed=false) %}
+                {% for proposal in proposals %}
+                    {% if proposal.id == postdetail.id and proposal.proposer == user.username %}
+                        {% set ns.has_proposed = true %}
+                    {% endif %}
+                {% endfor %}
+                
+                {% if ns.has_proposed %}
+                <!-- 已經提出報價的提示 -->
+                <div class="action-buttons">
+                    <div class="info-row" style="background-color: #e3f2fd; color: #1976d2; border-left: 4px solid #2196F3;">
+                        ✓ 您已提出承包意願，請等待委託人回應
+                    </div>
+                </div>
+                {% else %}
+                <!-- 尚未報價，顯示提案按鈕 -->
+                <div class="action-buttons">
+                    <a href="/proposalForm/{{ postdetail.id }}.html" class="btn btn-success">
+                        提出承包意願
+                    </a>
+                </div>
+                {% endif %}
             {% endif %}
             
             <!-- 如果是被指派的接案人，顯示上傳介面 -->
             {% if postdetail.contractor == user.username and postdetail.status in ['assigned', 'rejected'] %}
             <div class="upload-section">
                 <h3>上傳結案檔案</h3>
-                <form action="/api/upload" method= post enctype="multipart/form-data">
+                <form action="/api/upload" method="post" enctype="multipart/form-data">
                     <input type="file" name="uploadedFile" required>
                     <input type="hidden" name="msg" value="{{ postdetail.id }}">
                     <input type="submit" value="上傳檔案" class="btn btn-success">
@@ -288,7 +305,7 @@
             {% endif %}
             
             <!-- 如果已完成 -->
-            {% if postdetail.contractor == user.id and postdetail.status == 'completed' %}
+            {% if postdetail.contractor == user.username and postdetail.status == 'completed' %}
             <div class="info-row" style="background-color: #d4edda; color: #155724;">
                 ✓ 此專案已順利完成結案
             </div>

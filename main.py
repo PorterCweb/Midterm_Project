@@ -200,7 +200,7 @@ async def submitprop(
 ):
     proposer = request.session.get("user")
     await posts.submitProposal(conn, id, proposer, quote, message)
-    return RedirectResponse(url="/homepage", status_code=302)
+    return RedirectResponse(url=f"/postDetail/{id}", status_code=302)
 
 @app.get("/acceptSubmission/{id}")
 async def acceptsubmit(request:Request, id: int, conn=Depends(getDB)):
@@ -208,4 +208,10 @@ async def acceptsubmit(request:Request, id: int, conn=Depends(getDB)):
     await posts.acceptSubmission(conn,id,status)
     return RedirectResponse(url=f"/postDetail/{id}", status_code=302)
 
+@app.get("/rejectSubmission/{id}")
+async def rejectSubmit(request:Request, id:int, conn=Depends(getDB)):
+    status = 'rejected'
+    await posts.rejectSubmission(conn, id, status)
+    return RedirectResponse(url=f"/postDetail/{id}", status_code=302)
+                       
 app.mount("/", StaticFiles(directory="www"))

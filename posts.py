@@ -77,7 +77,14 @@ async def submitProposal(conn, id, proposer, quote, message):
 		sql = "insert into proposals (id, proposer, quote, message) values (%s,%s,%s,%s)"
 		await cur.execute(sql,(id,proposer,quote,message,))
 		return True
+	
 async def acceptSubmission(conn, id, status):
+	async with conn.cursor() as cur:
+		sql = "UPDATE posts SET status = %s WHERE id = %s"
+		await cur.execute(sql,(status,id,))
+		return True
+
+async def rejectSubmission(conn, id, status):
 	async with conn.cursor() as cur:
 		sql = "UPDATE posts SET status = %s WHERE id = %s"
 		await cur.execute(sql,(status,id,))
