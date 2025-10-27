@@ -58,7 +58,8 @@ async def login(
             postLists = await posts.getList(conn)
             return templates.TemplateResponse("clientForm.html", {"request": request, "user": user, "postLists": postLists})
         else:
-            return templates.TemplateResponse("contractorForm.html", {"request": request, "user": user})
+            postLists = await posts.getList(conn)
+            return templates.TemplateResponse("contractorForm.html", {"request": request, "user": user, "postLists": postLists})
     else:
         # 登入失敗
         return HTMLResponse(
@@ -123,7 +124,7 @@ async def readProposer(request: Request, id: int, conn=Depends(getDB)):
 @app.get("/delete/{id}")
 async def delPost(request: Request, id: int, conn=Depends(getDB)):
     await posts.deletePost(conn, id)
-    return RedirectResponse(url="/", status_code=302)
+    return RedirectResponse(url="/client", status_code=302)
 
 @app.get("/modifyPost/{id}.html")
 async def modify_get_form(request: Request, id: int, conn=Depends(getDB)):
@@ -172,9 +173,9 @@ async def addPost(
     status = "open"
     client = request.session.get("user")
     await posts.addPost(conn, title, content, price, status, client)
-    return RedirectResponse(url="/", status_code=302)
+    return RedirectResponse(url="/client", status_code=302)
 
-@app.post("/client")
+@app.get("/client")
 async def acceptprops(request: Request, conn=Depends(getDB)):
     user = {
             "username": request.session.get("user"),

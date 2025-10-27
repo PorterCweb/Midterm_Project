@@ -1,21 +1,234 @@
 <!DOCTYPE html>
 <html lang="zh-Hant-TW">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>FastAPI Template</title>
-  </head>
-  <body>
-<h1>工作委託列表</h1>
-Hello {{user.username}}
-<hr/>
-<ol>
-	{% for postList in postLists %}
-	<li>
-	<a href="/read/{{item.id}}"> {{ postList.title }}</a> <a href="/delete/{{item.id}}">刪除委託</a> 
-	</li>
-	{% endfor %}
-</ol>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>工作委託列表</title>
+    <style>
+        body {
+            font-family: "Microsoft JhengHei", Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .header {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .header h1 {
+            margin: 0 0 10px 0;
+            color: #333;
+        }
+        .user-info {
+            color: #666;
+            margin-bottom: 15px;
+        }
+        .nav-links {
+            margin-top: 15px;
+        }
+        .nav-links a {
+            margin-right: 15px;
+            padding: 8px 15px;
+            background-color: #2196F3;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            display: inline-block;
+        }
+        .nav-links a:hover {
+            background-color: #0b7dda;
+        }
+        .nav-links a.logout {
+            background-color: #f44336;
+        }
+        .nav-links a.logout:hover {
+            background-color: #da190b;
+        }
+        .nav-links a.add {
+            background-color: #4CAF50;
+        }
+        .nav-links a.add:hover {
+            background-color: #45a049;
+        }
+        .content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .post-list {
+            list-style: none;
+            padding: 0;
+        }
+        .post-postList {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .post-postList:last-child {
+            border-bottom: none;
+        }
+        .post-postList:hover {
+            background-color: #f9f9f9;
+        }
+        .post-info {
+            flex-grow: 1;
+        }
+        .post-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #2196F3;
+            text-decoration: none;
+            display: block;
+            margin-bottom: 5px;
+        }
+        .post-title:hover {
+            text-decoration: underline;
+        }
+        .post-meta {
+            color: #666;
+            font-size: 14px;
+        }
+        .post-status {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        .status-open {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .status-assigned {
+            background-color: #2196F3;
+            color: white;
+        }
+        .status-submitted {
+            background-color: #FF9800;
+            color: white;
+        }
+        .status-completed {
+            background-color: #9E9E9E;
+            color: white;
+        }
+        .status-rejected {
+            background-color: #f44336;
+            color: white;
+        }
+        .post-actions {
+            white-space: nowrap;
+        }
+        .post-actions a {
+            margin-left: 10px;
+            padding: 5px 10px;
+            border-radius: 3px;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .btn-modify {
+            background-color: #2196F3;
+            color: white;
+        }
+        .btn-delete {
+            background-color: #f44336;
+            color: white;
+        }
+        .btn-modify:hover {
+            background-color: #0b7dda;
+        }
+        .btn-delete:hover {
+            background-color: #da190b;
+        }
+        .empty-message {
+            text-align: center;
+            color: #999;
+            padding: 40px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>工作委託列表</h1>
+        {% if user %}
+        <div class="user-info">
+            歡迎，<strong>{{ user.username }}</strong> 
+            ({% if user.role == 'client' %}委託人{% else %}接案人{% endif %})
+        </div>
+        <div class="nav-links">
+            {% if user.role == 'client' %}
+            <a href="/addForm.html" class="add">新增委託</a>
+            {% endif %}
+            {% if user.role == 'contractor' %}
+            <a href="/myProposals">我的提案</a>
+            {% endif %}
+            <a href="/logout" class="logout">登出</a>
+        </div>
+        {% else %}
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="content">
+        {% if postLists %}
+        <ul class="post-list">
+            <h2>我的報價</h2>
+            {% for postList in postLists %}
+              {% if postList.contractor == '尚未有接案人' or user.username %}
+                <li class="post-postList">
+                    <div class="post-info">
+                        <a href="/read/{{ postList.id }}" class="post-title">{{ postList.title }}</a>
+                        <div class="post-meta">
+                            {% if postList.status %}
+                            <span class="post-status status-{{ postList.status }}">
+                                {% if postList.status == 'open' %}徵求中
+                                {% elif postList.status == 'assigned' %}已指派
+                                {% elif postList.status == 'submitted' %}已提交
+                                {% elif postList.status == 'completed' %}已完成
+                                {% elif postList.status == 'rejected' %}已退件
+                                {% endif %}
+                            </span>
+                            {% endif %}
+                            {% if postList.contractor %}
+                            | 接案人：{{ postList.contractor }}
+                            {% endif %}
+                            {% if postList.client %}
+                            | 委託人：{{ postList.client }}
+                            {% endif %}
+                            {% if postList.expectedquotation %}
+                            | 預期報價：{{ postList.expectedquotation }}
+                            {% endif %}
+                            {% if postList.finalquotation %}
+                            | 最終報價：{{ postList.finalquotation }}
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% if user and user.role == 'client' %}
+                    <div class="post-actions">
+                        <a href="/modifyPost/{{ postList.id }}.html" class="btn-modify">修改</a>
+                        <a href="/delete/{{ postList.id }}" class="btn-delete" onclick="return confirm('確定要刪除這個委託嗎？')">刪除</a>
+                    </div>
+                    {% endif %}
+                </li>
+              {% endif %}
+            {% endfor %}
+        </ul>
+        {% else %}
+        <div class="empty-message">
+            目前沒有任何委託專案
+            {% if user and user.role == 'client' %}
+            <br><br>
+            <a href="/addForm.html" style="color: #4CAF50; text-decoration: none; font-weight: bold;">+ 新增第一個委託</a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
 </body>
 </html>

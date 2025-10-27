@@ -179,6 +179,7 @@
     <div class="content">
         {% if postLists %}
         <ul class="post-list">
+            我的提案
             {% for postList in postLists %}
                 {% if postList.client == user.username%}
                     <li class="post-postList">
@@ -195,14 +196,17 @@
                                     {% endif %}
                                 </span>
                                 {% endif %}
-                                {% if postList.assigned_name %}
-                                | 接案人：{{ postList.assigned_name }}
+                                {% if postList.contractor %}
+                                | 接案人：{{ postList.contractor }}
                                 {% endif %}
-                                {% if postList.owner_name %}
-                                | 委託人：{{ postList.owner_name }}
+                                {% if postList.client %}
+                                | 委託人：{{ postList.client }}
                                 {% endif %}
                                 {% if postList.expectedquotation %}
-                                | 報價：{{ postList.expectedquotation }}
+                                | 預期報價：{{ postList.expectedquotation }}
+                                {% endif %}
+                                {% if postList.finalquotation %}
+                                | 最終報價：{{ postList.finalquotation }}
                                 {% endif %}
                             </div>
                         </div>
