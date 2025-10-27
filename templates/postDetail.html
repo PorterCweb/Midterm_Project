@@ -185,6 +185,12 @@
             <span class="info-value">{{ postdetail.expectedquotation }}</span>
         </div>
         {% endif %}
+        {% if postdetail.finalquotation %}
+        <div class="info-row">
+            <span class="info-label">最終報價：</span>
+            <span class="info-value">{{ postdetail.finalquotation }}</span>
+        </div>
+        {% endif %}
         
         <div class="section-title">內容概述</div>
         <div class="info-row">
@@ -209,7 +215,7 @@
                         <li class="proposal-item">
                             <div class="proposal-header">
                                 <span class="contractor-name">{{ proposal.proposer }}</span>
-                                <span class="proposal-expectedquotation">報價：{{ proposal.quote }}</span>
+                                <span class="proposal-expectedquotation">報價：{{ proposal.expected }}</span>
                             </div>
                             {% if proposal.message %}
                             <div class="proposal-message">
@@ -217,7 +223,7 @@
                             </div>
                             {% endif %}
                             <div style="margin-top: 10px;">
-                                <a href="/acceptProposal/{{ proposal }}" 
+                                <a href="/acceptProposal/{{ proposal.id }}/{{ proposal.proposer }}/{{ proposal.quote}}" 
                                 class="btn btn-success"
                                 onclick="return confirm('確定選擇 {{ proposal.contractor_name }} 作為接案人嗎？')">
                                     選擇此接案人

@@ -90,16 +90,7 @@ async def logout(request: Request):
 @app.get("/")
 async def root(request: Request, conn=Depends(getDB)):
     # 可選：加入登入驗證 user: str = Depends(get_current_user)
-    user = {
-            "username": request.session.get("user"),
-            "account": request.session.get("account"),
-            "role": request.session.get("role")
-        }
-    if user["role"] == "client":
-            postLists = await posts.getList(conn)
-            return templates.TemplateResponse("clientForm.html", {"request": request, "user": user, "postLists": postLists})
-    else:
-        pass
+    return RedirectResponse(url="/loginForm.html")
 
 @app.get("/file/{p:path}")
 async def getPath(p: str):
@@ -148,10 +139,10 @@ async def modify_Post(
     id: int,
     title: str=Form(...),
     content: str=Form(...),
-    expectedquotation: str=Form(...),
+    price: str=Form(...),
     conn=Depends(getDB)
 ):
-    await posts.modifyPost(conn, title, content, expectedquotation, id)
+    await posts.modifyPost(conn, title, content, price, id)
     return RedirectResponse(url="/", status_code=302)
 
 @app.get("/proposalList/{id}.html")
@@ -164,10 +155,10 @@ async def postStat(request: Request, id: int, conn=Depends(getDB)):
         "post": post
     })
 
-@app.get("/acceptProposal/{proposal}")
-async def acceptprops(request: Request, id: int, proposal: list, conn=Depends(getDB)):
+@app.get("/acceptProposal/{id}/{proposer}/{quote}")
+async def acceptprops(request: Request, id: int, proposer: str, quote: int, conn=Depends(getDB)):
     status = 'assigned'
-    await posts.acceptProposal(conn, id, proposal["proposer"], proposal["quote"], status)
+    await posts.acceptProposal(conn, id, proposer, quote, status)
     return RedirectResponse(url="/", status_code=302)
 
 @app.post("/addPost")
@@ -175,13 +166,26 @@ async def addPost(
     request: Request,
     title: str=Form(...),
     content: str=Form(...),
-    expectedquotation: str=Form(...),
+    price: str=Form(...),
     conn=Depends(getDB)
 ):
     status = "open"
     client = request.session.get("user")
-    await posts.addPost(conn, title, content, expectedquotation, status, client)
+    await posts.addPost(conn, title, content, price, status, client)
     return RedirectResponse(url="/", status_code=302)
 
+@app.post("/client")
+async def acceptprops(request: Request, conn=Depends(getDB)):
+    user = {
+            "username": request.session.get("user"),
+            "account": request.session.get("account"),
+            "role": request.session.get("role")
+        }
+    if user["role"] == "client":
+        postLists = await posts.getList(conn)
+        return templates.TemplateResponse("clientForm.html", {"request": request, "user": user, "postLists": postLists})
+    else:
+        postLists = await posts.getList(conn)
+        return templates.TemplateResponse("clientForm.html", {"request": request, "user": user, "postLists": postLists})
 
 app.mount("/", StaticFiles(directory="www"))

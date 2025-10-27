@@ -180,38 +180,40 @@
         {% if postLists %}
         <ul class="post-list">
             {% for postList in postLists %}
-            <li class="post-postList">
-                <div class="post-info">
-                    <a href="/read/{{ postList.id }}" class="post-title">{{ postList.title }}</a>
-                    <div class="post-meta">
-                        {% if postList.status %}
-                        <span class="post-status status-{{ postList.status }}">
-                            {% if postList.status == 'open' %}徵求中
-                            {% elif postList.status == 'assigned' %}已指派
-                            {% elif postList.status == 'submitted' %}已提交
-                            {% elif postList.status == 'completed' %}已完成
-                            {% elif postList.status == 'rejected' %}已退件
-                            {% endif %}
-                        </span>
+                {% if postList.client == user.username%}
+                    <li class="post-postList">
+                        <div class="post-info">
+                            <a href="/read/{{ postList.id }}" class="post-title">{{ postList.title }}</a>
+                            <div class="post-meta">
+                                {% if postList.status %}
+                                <span class="post-status status-{{ postList.status }}">
+                                    {% if postList.status == 'open' %}徵求中
+                                    {% elif postList.status == 'assigned' %}已指派
+                                    {% elif postList.status == 'submitted' %}已提交
+                                    {% elif postList.status == 'completed' %}已完成
+                                    {% elif postList.status == 'rejected' %}已退件
+                                    {% endif %}
+                                </span>
+                                {% endif %}
+                                {% if postList.assigned_name %}
+                                | 接案人：{{ postList.assigned_name }}
+                                {% endif %}
+                                {% if postList.owner_name %}
+                                | 委託人：{{ postList.owner_name }}
+                                {% endif %}
+                                {% if postList.expectedquotation %}
+                                | 報價：{{ postList.expectedquotation }}
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% if user and user.role == 'client' %}
+                        <div class="post-actions">
+                            <a href="/modifyPost/{{ postList.id }}.html" class="btn-modify">修改</a>
+                            <a href="/delete/{{ postList.id }}" class="btn-delete" onclick="return confirm('確定要刪除這個委託嗎？')">刪除</a>
+                        </div>
                         {% endif %}
-                        {% if postList.assigned_name %}
-                        | 接案人：{{ postList.assigned_name }}
-                        {% endif %}
-                        {% if postList.owner_name %}
-                        | 委託人：{{ postList.owner_name }}
-                        {% endif %}
-                        {% if postList.expectedquotation %}
-                        | 報價：{{ postList.expectedquotation }}
-                        {% endif %}
-                    </div>
-                </div>
-                {% if user and user.role == 'client' %}
-                <div class="post-actions">
-                    <a href="/modifyPost/{{ postList.id }}.html" class="btn-modify">修改</a>
-                    <a href="/delete/{{ postList.id }}" class="btn-delete" onclick="return confirm('確定要刪除這個委託嗎？')">刪除</a>
-                </div>
+                    </li>
                 {% endif %}
-            </li>
             {% endfor %}
         </ul>
         {% else %}
