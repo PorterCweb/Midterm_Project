@@ -107,7 +107,7 @@ def redirect():
 
 @app.get("/postDetail/{id}")
 async def readPost(request: Request, id: int, conn=Depends(getDB)):
-    postDetail = await posts.getProposalFromID(conn, id)
+    postDetail = await posts.getPostFromID(conn, id)
     proposals = await posts.getProposals(conn)
     user = {
         "username": request.session.get("user"),
@@ -190,16 +190,16 @@ async def acceptprop(request: Request, conn=Depends(getDB)):
         postLists = await posts.getList(conn)
         return templates.TemplateResponse("contractorForm.html", {"request": request, "user": user, "postLists": postLists})
 
-@app.post("/submitproposal/{id}/{username}")
+@app.post("/submitProposal/{id}")
 async def submitprop(
     request:Request, 
     id: int, 
-    username: str,
     quote: int,
     message: str,
     conn =Depends(getDB)
 ):
-    await posts.submitproposal(id, username, quote, message)
+    proposer = request.session.get("user")
+    await posts.submitProposal(conn, id, proposer, quote, message)
     return RedirectResponse(url="/homepage", status_code=302)
 
 app.mount("/", StaticFiles(directory="www"))

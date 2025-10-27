@@ -90,20 +90,20 @@
     </style>
 </head>
 <body>
-    <a href="/postDetail/{{ post.id }}" class="back-link">← 返回專案詳情</a>
+    <a href="/postDetail/{{ postdetail.id }}" class="back-link">← 返回專案詳情</a>
     
     <div class="container">
         <h2>提出承包意願</h2>
         
         <div class="project-info">
-            <h3>{{ post.title }}</h3>
-            <p><strong>內容：</strong>{{ post.content }}</p>
-            {% if post.expectedquotation %}
-            <p><strong>預期報價：</strong>{{ post.expectedquotation }}</p>
+            <h3>{{ postdetail.title }}</h3>
+            <p><strong>內容：</strong>{{ postdetail.content }}</p>
+            {% if postdetail.expectedquotation %}
+            <p><strong>預期報價：</strong>{{ postdetail.expectedquotation }}</p>
             {% endif %}
         </div>
         
-        <form method="POST" action="/submitProposal/{{ post.id }}/{{ user.username }}">
+        <form method="POST" action="/submitProposal/{{ postdetail.id }}">
             <div class="form-group">
                 <label for="quote">您的報價：*</label>
                 <input type="text" id="quote" name="quote" required placeholder="例如：NT$ 45,000">

@@ -49,7 +49,7 @@ async def acceptProposal(conn, id, proposer, quote, status):
 
 async def addPost(conn, title, content, expectedquotation, status, client):
 	async with conn.cursor() as cur:
-		sql="insert into posts (title, content, expectedquotation, status, client) values (%s,%s,%s,%s,%s);"
+		sql = "insert into posts (title, content, expectedquotation, status, client) values (%s,%s,%s,%s,%s);"
 		await cur.execute(sql,(title,content,expectedquotation,status,client))
 		return True
 
@@ -72,7 +72,7 @@ async def getUsers(conn, account):
 		row = await cur.fetchone()
 		return row
 	
-async def submitproposal(conn, id, proposer, quote, message):
+async def submitProposal(conn, id, proposer, quote, message):
 	async with conn.cursor() as cur:
 		sql = "insert into proposals (id, proposer, quote, message) values (%s,%s,%s,%s)"
 		await cur.execute(sql,(id,proposer,quote,message,))
