@@ -116,7 +116,7 @@ def redirect():
 @app.get("/read/{id}")
 async def readPost(request: Request, id: int, conn=Depends(getDB)):
     postDetail = await posts.getPost(conn, id)
-    proposals = await posts.GetProposalFromID(conn, id)
+    proposals = await posts.getProposals(conn)
     user = {
         "username": request.session.get("user"),
         "account": request.session.get("account"),
@@ -126,7 +126,7 @@ async def readPost(request: Request, id: int, conn=Depends(getDB)):
 
 @app.get("/readProposer/{id}")
 async def readProposer(request: Request, id: int, conn=Depends(getDB)):
-    postDetail = await posts.GetProposalFromID(conn, id)
+    postDetail = await posts.getProposalFromID(conn, id)
     return templates.TemplateResponse("proposallist.html", {"request": request, "post": postDetail})
 
 @app.get("/delete/{id}")
@@ -148,25 +148,26 @@ async def modify_Post(
     id: int,
     title: str=Form(...),
     content: str=Form(...),
-    price: str=Form(...),
+    expectedquotation: str=Form(...),
     conn=Depends(getDB)
 ):
-    await posts.modifyPost(conn, title, content, price, id)
+    await posts.modifyPost(conn, title, content, expectedquotation, id)
     return RedirectResponse(url="/", status_code=302)
 
-@app.get("/proposallist/{id}.html")
+@app.get("/proposalList/{id}.html")
 async def postStat(request: Request, id: int, conn=Depends(getDB)):
-    proposal = await posts.GetProposalFromID(conn, id)
+    proposal = await posts.getProposalFromID(conn, id)
     post = await posts.getPost(conn, id)
     return templates.TemplateResponse("proposallist.html", {
-        "request": request,
+        "request": request, 
         "proposal": proposal,
         "post": post
     })
 
-@app.get("/acceptproposal/{id}")
-async def acceptprops(request: Request, id: int, conn=Depends(getDB)):
-    await posts.acceptproposal(conn, id)
+@app.get("/acceptProposal/{proposal}")
+async def acceptprops(request: Request, id: int, proposal: list, conn=Depends(getDB)):
+    status = 'assigned'
+    await posts.acceptProposal(conn, id, proposal["proposer"], proposal["quote"], status)
     return RedirectResponse(url="/", status_code=302)
 
 @app.post("/addPost")
@@ -174,12 +175,12 @@ async def addPost(
     request: Request,
     title: str=Form(...),
     content: str=Form(...),
-    price: str=Form(...),
+    expectedquotation: str=Form(...),
     conn=Depends(getDB)
 ):
     status = "open"
     client = request.session.get("user")
-    await posts.addPost(conn, title, content, price, status, client)
+    await posts.addPost(conn, title, content, expectedquotation, status, client)
     return RedirectResponse(url="/", status_code=302)
 
 

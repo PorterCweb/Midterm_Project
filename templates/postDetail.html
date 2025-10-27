@@ -83,7 +83,7 @@
             font-weight: bold;
             color: #2196F3;
         }
-        .proposal-price {
+        .proposal-expectedquotation {
             color: #4CAF50;
             font-weight: bold;
         }
@@ -172,17 +172,17 @@
         
         <div class="info-row">
             <span class="info-label">接案人：</span>
-            {% if postdetail.contractor == '尚未有接案人'%}
-                <span class="info-value">{{ 尚未有接案人 }}</span>
+            {% if postdetail.contractor == '尚未有接案人' %}
+                <span class="info-value">尚未有接案人</span>
             {% else %}
                 <span class="info-value">{{ postdetail.contractor }}</span>
             {% endif %}
         </div>
         
-        {% if postdetail.price %}
+        {% if postdetail.expectedquotation %}
         <div class="info-row">
             <span class="info-label">預期報價：</span>
-            <span class="info-value">{{ postdetail.price }}</span>
+            <span class="info-value">{{ postdetail.expectedquotation }}</span>
         </div>
         {% endif %}
         
@@ -205,24 +205,26 @@
             <div class="section-title">承包意願提案</div>
             <ul class="proposals-list">
                 {% for proposal in proposals %}
-                <li class="proposal-item">
-                    <div class="proposal-header">
-                        <span class="contractor-name">{{ proposal.proporser }}</span>
-                        <span class="proposal-price">報價：{{ proposal.price }}</span>
-                    </div>
-                    {% if proposal.message %}
-                    <div class="proposal-message">
-                        訊息：{{ proposal.message }}
-                    </div>
+                    {% if proposal.id == postdetail.id %}
+                        <li class="proposal-item">
+                            <div class="proposal-header">
+                                <span class="contractor-name">{{ proposal.proposer }}</span>
+                                <span class="proposal-expectedquotation">報價：{{ proposal.quote }}</span>
+                            </div>
+                            {% if proposal.message %}
+                            <div class="proposal-message">
+                                訊息（疑問）：{{ proposal.message }}
+                            </div>
+                            {% endif %}
+                            <div style="margin-top: 10px;">
+                                <a href="/acceptProposal/{{ proposal }}" 
+                                class="btn btn-success"
+                                onclick="return confirm('確定選擇 {{ proposal.contractor_name }} 作為接案人嗎？')">
+                                    選擇此接案人
+                                </a>
+                            </div>
+                        </li>
                     {% endif %}
-                    <div style="margin-top: 10px;">
-                        <a href="/acceptProposal/{{ proposal.id }}/{{ postdetail.id }}" 
-                           class="btn btn-success"
-                           onclick="return confirm('確定選擇 {{ proposal.contractor_name }} 作為接案人嗎？')">
-                            選擇此接案人
-                        </a>
-                    </div>
-                </li>
                 {% endfor %}
             </ul>
             {% elif postdetail.status == 'open' %}

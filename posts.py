@@ -14,13 +14,19 @@ async def getPost(conn, id):
 		await cur.execute(sql,(id,))
 		row = await cur.fetchone()
 		return row
+
+async def getProposals(conn):
+	async with conn.cursor() as cur:
+		sql = "SELECT * FROM proposals"
+		await cur.execute(sql)
+		rows = await cur.fetchall()
+		return rows
 	
-async def GetProposalFromID(conn, id):
+async def getProposalFromID(conn, id):
 	async with conn.cursor() as cur:
 		sql="select * from proposals where id = %s;"
 		await cur.execute(sql,(id,))
 		rows = await cur.fetchall()
-		print(rows)
 		return rows
 
 async def deletePost(conn, id):
@@ -29,22 +35,22 @@ async def deletePost(conn, id):
 		await cur.execute(sql,(id,))
 		return True
 	
-async def modifyPost(conn, title, content, price, id):
+async def modifyPost(conn, title, content, expectedquotation, id):
 	async with conn.cursor() as cur:
-		sql = "UPDATE posts SET title = %s, content = %s, price = %s WHERE id = %s"
-		await cur.execute(sql,(title, content, price, id))
+		sql = "UPDATE posts SET title = %s, content = %s, expectedquotation = %s WHERE id = %s"
+		await cur.execute(sql,(title, content, expectedquotation, id,))
 		return True
 
-async def acceptproposal(conn, id):
+async def acceptProposal(conn, id, proposer, quote, status):
 	async with conn.cursor() as cur:
-		sql = "UPDATE posts SET status = '已有人報價' WHERE id = %s"
-		await cur.execute(sql,(id,))
+		sql = "UPDATE posts SET status = %s, contractor = %s, finalquotation = %s WHERE id = %s"
+		await cur.execute(sql,(status, proposer, quote, id,))
 		return True
 
-async def addPost(conn, title, content, price, status,client):
+async def addPost(conn, title, content, expectedquotation, status,client):
 	async with conn.cursor() as cur:
-		sql="insert into posts (title, content, price, status, client) values (%s,%s,%s,%s,%s);"
-		await cur.execute(sql,(title,content,price,status,client))
+		sql="insert into posts (title, content, expectedquotation, status, client) values (%s,%s,%s,%s,%s);"
+		await cur.execute(sql,(title,content,expectedquotation,status,client))
 		return True
 
 async def setUploadFile(conn, id, filename):
@@ -56,7 +62,7 @@ async def setUploadFile(conn, id, filename):
 async def register(conn, username, account, password, role):
 	async with conn.cursor() as cur:
 		sql = "insert into users (username, account, password, role) values (%s,%s,%s,%s);"
-		await cur.execute(sql,(username, account, password, role))
+		await cur.execute(sql,(username, account, password, role,))
 		return True
 
 async def getUsers(conn, account):
