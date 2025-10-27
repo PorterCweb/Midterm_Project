@@ -161,7 +161,7 @@ async def postStat(request: Request, id: int, conn=Depends(getDB)):
 async def acceptprops(request: Request, id: int, proposer: str, quote: int, conn=Depends(getDB)):
     status = 'assigned'
     await posts.acceptProposal(conn, id, proposer, quote, status)
-    return RedirectResponse(url="/", status_code=302)
+    return RedirectResponse(url="/homepage", status_code=302)
 
 @app.post("/addPost")
 async def addPost(
@@ -194,8 +194,8 @@ async def acceptprop(request: Request, conn=Depends(getDB)):
 async def submitprop(
     request:Request, 
     id: int, 
-    quote: int,
-    message: str,
+    quote: int = Form(...),  # 由於沒有 Form(...) 標記，FastAPI 預設會從 URL 的 query string 中尋找這些參數，而不是從表單數據中。
+    message: str = Form(...),  # 由於沒有 Form(...) 標記，FastAPI 預設會從 URL 的 query string 中尋找這些參數，而不是從表單數據中。
     conn =Depends(getDB)
 ):
     proposer = request.session.get("user")

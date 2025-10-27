@@ -215,7 +215,7 @@
                         <li class="proposal-item">
                             <div class="proposal-header">
                                 <span class="contractor-name">{{ proposal.proposer }}</span>
-                                <span class="proposal-expectedquotation">報價：{{ proposal.expected }}</span>
+                                <span class="proposal-expectedquotation">報價：{{ proposal.quote }}</span>
                             </div>
                             {% if proposal.message %}
                             <div class="proposal-message">
@@ -272,7 +272,7 @@
             {% if postdetail.assigned_to == user.id and postdetail.status in ['assigned', 'rejected'] %}
             <div class="upload-section">
                 <h3>上傳結案檔案</h3>
-                <form action="/api/upload" method= postdetail" enctype="multipart/form-data">
+                <form action="/api/upload" method= postdetail enctype="multipart/form-data">
                     <input type="file" name="uploadedFile" required>
                     <input type="hidden" name="msg" value="{{ postdetail.id }}">
                     <input type="submit" value="上傳檔案" class="btn btn-success">
