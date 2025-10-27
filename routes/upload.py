@@ -24,8 +24,9 @@ async def upload_file(
 	#參考下面的safeFilename()
 	with open(f"www/uploads/{uploadedFile.filename}", "wb") as f:
 		f.write(contents)
-	await posts.setUploadFile(conn, msg,uploadedFile.filename)
-	return RedirectResponse(url=f"/read/{msg}", status_code=302)
+	status = 'submitted'
+	await posts.setUploadFile(conn, msg, uploadedFile.filename, status)
+	return RedirectResponse(url=f"/postDetail/{msg}", status_code=302)
 
 
 def safeFilename(filename:str):

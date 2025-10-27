@@ -53,10 +53,10 @@ async def addPost(conn, title, content, expectedquotation, status, client):
 		await cur.execute(sql,(title,content,expectedquotation,status,client))
 		return True
 
-async def setUploadFile(conn, id, filename):
+async def setUploadFile(conn, id, filename, status):
 	async with conn.cursor() as cur:
-		sql="update posts set filename=%s where id=%s;"
-		await cur.execute(sql,(filename,id,))
+		sql="update posts set filename=%s, status=%s where id=%s;"
+		await cur.execute(sql,(filename, status, id,))
 		return True
 	
 async def register(conn, username, account, password, role):
@@ -76,4 +76,9 @@ async def submitProposal(conn, id, proposer, quote, message):
 	async with conn.cursor() as cur:
 		sql = "insert into proposals (id, proposer, quote, message) values (%s,%s,%s,%s)"
 		await cur.execute(sql,(id,proposer,quote,message,))
+		return True
+async def acceptSubmission(conn, id, status):
+	async with conn.cursor() as cur:
+		sql = "UPDATE posts SET status = %s WHERE id = %s"
+		await cur.execute(sql,(status,id,))
 		return True

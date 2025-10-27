@@ -119,14 +119,14 @@ async def readPost(request: Request, id: int, conn=Depends(getDB)):
 @app.get("/delete/{id}")
 async def delPost(request: Request, id: int, conn=Depends(getDB)):
     await posts.deletePost(conn, id)
-    return RedirectResponse(url="/client", status_code=302)
+    return RedirectResponse(url="/homepage", status_code=302)
 
 @app.get("/modifyPost/{id}.html")
 async def modify_get_form(request: Request, id: int, conn=Depends(getDB)):
-    post = await posts.getProposalFromID(conn, id)
+    postDetail = await posts.getPostFromID(conn, id)
     return templates.TemplateResponse("modifyPost.html", {
         "request": request,
-        "post": post,
+        "postdetail": postDetail,
     })
 
 @app.post("/modifyPost/{id}")
@@ -135,11 +135,11 @@ async def modify_Post(
     id: int,
     title: str=Form(...),
     content: str=Form(...),
-    price: str=Form(...),
+    expectedquotation: str=Form(...),
     conn=Depends(getDB)
 ):
-    await posts.modifyPost(conn, title, content, price, id)
-    return RedirectResponse(url="/", status_code=302)
+    await posts.modifyPost(conn, title, content, expectedquotation, id)
+    return RedirectResponse(url="/homepage", status_code=302)
 
 @app.get("/proposalForm/{id}.html")
 async def postStat(request: Request, id: int, conn=Depends(getDB)):
@@ -201,5 +201,11 @@ async def submitprop(
     proposer = request.session.get("user")
     await posts.submitProposal(conn, id, proposer, quote, message)
     return RedirectResponse(url="/homepage", status_code=302)
+
+@app.get("/acceptSubmission/{id}")
+async def acceptsubmit(request:Request, id: int, conn=Depends(getDB)):
+    status = 'completed'
+    await posts.acceptSubmission(conn,id,status)
+    return RedirectResponse(url=f"/postDetail/{id}", status_code=302)
 
 app.mount("/", StaticFiles(directory="www"))

@@ -269,10 +269,10 @@
             {% endif %}
             
             <!-- 如果是被指派的接案人，顯示上傳介面 -->
-            {% if postdetail.assigned_to == user.id and postdetail.status in ['assigned', 'rejected'] %}
+            {% if postdetail.contractor == user.username and postdetail.status in ['assigned', 'rejected'] %}
             <div class="upload-section">
                 <h3>上傳結案檔案</h3>
-                <form action="/api/upload" method= postdetail enctype="multipart/form-data">
+                <form action="/api/upload" method= post enctype="multipart/form-data">
                     <input type="file" name="uploadedFile" required>
                     <input type="hidden" name="msg" value="{{ postdetail.id }}">
                     <input type="submit" value="上傳檔案" class="btn btn-success">
@@ -281,14 +281,14 @@
             {% endif %}
             
             <!-- 如果已提交，等待委託人確認 -->
-            {% if postdetail.assigned_to == user.id and postdetail.status == 'submitted' %}
+            {% if postdetail.contractor == user.username and postdetail.status == 'submitted' %}
             <div class="info-row" style="background-color: #fff3cd; color: #856404;">
                 已提交結案檔案，等待委託人確認中...
             </div>
             {% endif %}
             
             <!-- 如果已完成 -->
-            {% if postdetail.assigned_to == user.id and postdetail.status == 'completed' %}
+            {% if postdetail.contractor == user.id and postdetail.status == 'completed' %}
             <div class="info-row" style="background-color: #d4edda; color: #155724;">
                 ✓ 此專案已順利完成結案
             </div>
