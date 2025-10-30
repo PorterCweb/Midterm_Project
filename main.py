@@ -30,14 +30,7 @@ app.add_middleware(
 app.include_router(upload_router, prefix="/api") 
 app.include_router(db_router, prefix="/api")
 
-# ===== 新增：登入檢查函數 =====
-def get_current_user(request: Request):
-    user_id = request.session.get("user")
-    if not user_id:
-        raise HTTPException(status_code=401, detail="Not authenticated")
-    return user_id
-
-# ===== 新增：登入路由 =====
+# ===== 登入路由 =====
 @app.post("/login")
 async def login(
     request: Request,
@@ -48,7 +41,7 @@ async def login(
     # 從資料庫查詢使用者
     user = await posts.getUsers(conn,account)
     # 驗證使用者
-    if user["account"] == account and user["password"] == password:
+    if user!= None and user["account"] == account and user["password"] == password:
         # 登入成功，將使用者資訊存入 Session
         request.session["user"] = user["username"]
         request.session["account"] = user["account"]
@@ -60,15 +53,19 @@ async def login(
         else:
             postLists = await posts.getList(conn)
             return templates.TemplateResponse("contractorForm.html", {"request": request, "user": user, "postLists": postLists})
+    elif user == None:
+        return HTMLResponse(
+			"帳號不存在 <a href='/registerForm.html'> 立即註冊 </a>", 
+			status_code=401
+		)
     else:
-        # 登入失敗
+        # 密碼錯誤
         return HTMLResponse(
 			"帳號或密碼錯誤 <a href='/loginForm.html'> 重新登入</a>", 
 			status_code=401
 		)
 
-
-# ===== 新增：註冊路由 =====
+# ===== 註冊路由 =====
 @app.post("/register")
 async def register(
     request: Request,
@@ -81,16 +78,15 @@ async def register(
     await posts.register(conn, username, account, password, role)
     return RedirectResponse(url="/loginForm.html", status_code=302)
 
-# ===== 新增：登出路由 =====
+# ===== 登出路由 =====
 @app.get("/logout")
 async def logout(request: Request):
     request.session.clear()
     return RedirectResponse(url="/loginForm.html")
 
-# ===== 原有路由（可選擇性加入登入驗證） =====
+# ===== 原有路由 =====
 @app.get("/")
 async def root(request: Request, conn=Depends(getDB)):
-    # 可選：加入登入驗證 user: str = Depends(get_current_user)
     return RedirectResponse(url="/loginForm.html")
 
 @app.get("/file/{p:path}")
