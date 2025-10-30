@@ -181,7 +181,7 @@
         <ul class="post-list">
             <h2>專案</h2>
             {% for postList in postLists %}
-              {% if postList.status == 'open' or postList.contractor == user.username %}
+              {% if postList.status == 'open' or postList.contractor == user.username and postList.status != 'completed' %}
                 <li class="post-postList">
                     <div class="post-info">
                         <a href="/postDetail/{{ postList.id }}" class="post-title">{{ postList.title }}</a>

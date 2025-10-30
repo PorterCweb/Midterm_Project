@@ -48,7 +48,7 @@ async def login(
     # 從資料庫查詢使用者
     user = await posts.getUsers(conn,account)
     # 驗證使用者
-    if user and user["password"] == password:
+    if user["account"] == account and user["password"] == password:
         # 登入成功，將使用者資訊存入 Session
         request.session["user"] = user["username"]
         request.session["account"] = user["account"]
@@ -213,5 +213,21 @@ async def rejectSubmit(request:Request, id:int, conn=Depends(getDB)):
     status = 'rejected'
     await posts.rejectSubmission(conn, id, status)
     return RedirectResponse(url=f"/postDetail/{id}", status_code=302)
-                       
+
+@app.get("/myProposals")
+async def myProposals(request: Request, conn=Depends(getDB)):
+    user = {
+        "username": request.session.get("user"),
+        "account": request.session.get("account"),
+        "role": request.session.get("role")
+    }
+    # 獲取歷史專案
+    historyProjects = await posts.getHistoryProjects(conn, user["username"], user["role"])
+    return templates.TemplateResponse("historyProjects.html", {
+        "request": request, 
+        "user": user, 
+        "historyProjects": historyProjects
+    })
+
+
 app.mount("/", StaticFiles(directory="www"))

@@ -89,3 +89,16 @@ async def rejectSubmission(conn, id, status):
 		sql = "UPDATE posts SET status = %s WHERE id = %s"
 		await cur.execute(sql,(status,id,))
 		return True
+
+async def getHistoryProjects(conn, username, role):
+	async with conn.cursor() as cur:
+		if role == 'client':
+			# 委託人查看自己發布的已完成專案
+			sql = "SELECT * FROM posts WHERE client = %s AND status = 'completed' ORDER BY id DESC;"
+			await cur.execute(sql, (username,))
+		else:
+			# 接案人查看自己接案的已完成專案
+			sql = "SELECT * FROM posts WHERE contractor = %s AND status = 'completed' ORDER BY id DESC;"
+			await cur.execute(sql, (username,))
+		rows = await cur.fetchall()
+		return rows

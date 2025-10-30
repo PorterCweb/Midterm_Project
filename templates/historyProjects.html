@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>歷史專案</title>
+    <style>
+        body {
+            font-family: "Microsoft JhengHei", Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .header {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .header h1 {
+            margin: 0 0 10px 0;
+            color: #333;
+        }
+        .user-info {
+            color: #666;
+            margin-bottom: 15px;
+        }
+        .nav-links {
+            margin-top: 15px;
+        }
+        .nav-links a {
+            margin-right: 15px;
+            padding: 8px 15px;
+            background-color: #2196F3;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            display: inline-block;
+        }
+        .nav-links a:hover {
+            background-color: #0b7dda;
+        }
+        .nav-links a.logout {
+            background-color: #f44336;
+        }
+        .nav-links a.logout:hover {
+            background-color: #da190b;
+        }
+        .content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .project-list {
+            list-style: none;
+            padding: 0;
+        }
+        .project-item {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .project-item:last-child {
+            border-bottom: none;
+        }
+        .project-item:hover {
+            background-color: #f9f9f9;
+        }
+        .project-info {
+            flex-grow: 1;
+        }
+        .project-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #2196F3;
+            text-decoration: none;
+            display: block;
+            margin-bottom: 5px;
+        }
+        .project-title:hover {
+            text-decoration: underline;
+        }
+        .project-meta {
+            color: #666;
+            font-size: 14px;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+            font-weight: bold;
+            background-color: #9E9E9E;
+            color: white;
+        }
+        .empty-message {
+            text-align: center;
+            color: #999;
+            padding: 40px;
+        }
+        .stats-card {
+            background-color: #e3f2fd;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .stats-number {
+            font-size: 36px;
+            font-weight: bold;
+            color: #2196F3;
+        }
+        .stats-label {
+            color: #666;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>歷史專案</h1>
+        {% if user %}
+        <div class="user-info">
+            歡迎，<strong>{{ user.username }}</strong> 
+            ({% if user.role == 'client' %}委託人{% else %}接案人{% endif %})
+        </div>
+        <div class="nav-links">
+            <a href="/homepage">返回首頁</a>
+            <a href="/logout" class="logout">登出</a>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="content">
+        {% if historyProjects %}
+        <div class="stats-card">
+            <div class="stats-number">{{ historyProjects|length }}</div>
+            <div class="stats-label">已完成的專案總數</div>
+        </div>
+
+        <h2>已完成專案列表</h2>
+        <ul class="project-list">
+            {% for project in historyProjects %}
+            <li class="project-item">
+                <div class="project-info">
+                    <a href="/postDetail/{{ project.id }}" class="project-title">{{ project.title }}</a>
+                    <div class="project-meta">
+                        <span class="status-badge">已完成</span>
+                        {% if user.role == 'client' %}
+                        | 接案人：{{ project.contractor }}
+                        {% else %}
+                        | 委託人：{{ project.client }}
+                        {% endif %}
+                        {% if project.finalquotation %}
+                        | 最終報價：{{ project.finalquotation }}
+                        {% endif %}
+                    </div>
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <div class="empty-message">
+            目前還沒有已完成的專案
+            <br><br>
+            <a href="/homepage" style="color: #2196F3; text-decoration: none; font-weight: bold;">← 返回首頁</a>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>
