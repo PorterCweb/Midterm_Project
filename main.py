@@ -135,7 +135,7 @@ async def modify_Post(
     conn=Depends(getDB)
 ):
     await posts.modifyPost(conn, title, content, expectedquotation, id)
-    return RedirectResponse(url="/homepage", status_code=302)
+    return RedirectResponse(url="/homepage", status_code=302)   
 
 @app.get("/proposalForm/{id}.html")
 async def postStat(request: Request, id: int, conn=Depends(getDB)):
@@ -153,11 +153,17 @@ async def postStat(request: Request, id: int, conn=Depends(getDB)):
         "user": user
     })
 
-@app.get("/acceptProposal/{id}/{proposer}/{quote}")
-async def acceptprops(request: Request, id: int, proposer: str, quote: int, conn=Depends(getDB)):
+@app.post("/acceptProposal/{id}")
+async def acceptprops(
+    request: Request, 
+    id: int,
+    proposer: str = Form(...),  
+    quote: int = Form(...),      
+    conn = Depends(getDB)
+):
     status = 'assigned'
     await posts.acceptProposal(conn, id, proposer, quote, status)
-    return RedirectResponse(url="/homepage", status_code=302)
+    return RedirectResponse(url="/homepage", status_code=303)
 
 @app.post("/addPost")
 async def addPost(
@@ -190,7 +196,7 @@ async def acceptprop(request: Request, conn=Depends(getDB)):
 async def submitprop(
     request:Request, 
     id: int, 
-    quote: int = Form(...),  # 由於沒有 Form(...) 標記，FastAPI 預設會從 URL 的 query string 中尋找這些參數，而不是從表單數據中。
+    quote: int = Form(...),  
     message: str = Form(...),  # 由於沒有 Form(...) 標記，FastAPI 預設會從 URL 的 query string 中尋找這些參數，而不是從表單數據中。
     conn =Depends(getDB)
 ):
@@ -210,7 +216,7 @@ async def rejectSubmit(request:Request, id:int, conn=Depends(getDB)):
     await posts.rejectSubmission(conn, id, status)
     return RedirectResponse(url=f"/postDetail/{id}", status_code=302)
 
-@app.get("/myProposals")
+@app.get("/historyProjects")
 async def myProposals(request: Request, conn=Depends(getDB)):
     user = {
         "username": request.session.get("user"),

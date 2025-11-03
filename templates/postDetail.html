@@ -223,11 +223,14 @@
                             </div>
                             {% endif %}
                             <div style="margin-top: 10px;">
-                                <a href="/acceptProposal/{{ proposal.id }}/{{ proposal.proposer }}/{{ proposal.quote}}" 
-                                class="btn btn-success"
-                                onclick="return confirm('確定選擇 {{ proposal.contractor_name }} 作為接案人嗎？')">
-                                    選擇此接案人
-                                </a>
+                                <form method="POST" action="/acceptProposal/{{ proposal.id }}" style="display: inline;">
+                                    <input type="hidden" name="proposer" value="{{ proposal.proposer }}">
+                                    <input type="hidden" name="quote" value="{{ proposal.quote }}">
+                                    <button type="submit" class="btn btn-success"
+                                            onclick="return confirm('確定選擇 {{ proposal.proposer }} 作為接案人嗎？')">
+                                        選擇此接案人
+                                    </button>
+                                </form>
                             </div>
                         </li>
                     {% endif %}
